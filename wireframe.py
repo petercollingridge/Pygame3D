@@ -27,10 +27,21 @@ class Wireframe:
             print "to (%d, %d, %d)" % (edge.stop[0],  edge.stop[1],  edge.stop[2])    
     
     def translate(self, v):
-        self.nodes -= v
+        self.nodes += v
     
     def scale(self, scale, cx=0, cy=0, cz=0):
+        """ Scale relative to the origin then translate to centre given point """
+        
         self.nodes *= np.array([scale, scale, scale])
+        self.translate(np.array([(1-scale)*cx, (scale-1)*-cy, (1-scale)*-cz]))
+    
+    def findCentre(self):
+        """ Find the spatial centre by finding the range of the x, y and z coordinates. """
+
+        min_values = [self.nodes[:,n].min() for n in range(3)]
+        max_values = [self.nodes[:,n].max() for n in range(3)]
+        
+        return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
 
 class WireframeGroup:
     def __init__(self):
@@ -55,6 +66,20 @@ class WireframeGroup:
         for wireframe in self.wireframes.values():
             wireframe.translate(v)
 
+    def scale(self, scale, cx, cy, cz):
+        """ Scale wireframes in all directions from a given centre. """
+        
+        for wireframe in self.wireframes.values():
+            wireframe.scale(scale, cx, cy, cz)
+    
+    def findCentre(self):
+        """ Find the central point of all the wireframes. """
+        
+        min_values = [min((wireframe.nodes[:,n].min() for wireframe in self.wireframes.values())) for n in range(3)]
+        max_values = [max((wireframe.nodes[:,n].max() for wireframe in self.wireframes.values())) for n in range(3)]
+        
+        return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
+
 def getCuboid(x,y,z,w,h,d):
     """ Return a wireframe cuboid centred on (x,y,z)
         with width, w, height, h, and depth, d. """
@@ -66,8 +91,11 @@ def getCuboid(x,y,z,w,h,d):
 
     return cuboid
 if __name__ == '__main__':
-    cube = getCuboid(100,100,10,20,30,40)
-    cube.translate(np.array([10,2,0]))
-    
-    cube.outputNodes()
-    cube.outputEdges()
+    g = WireframeGroup()
+    g.addWireframe('cube1', getCuboid(100,100,10,20,30,40))
+    g.addWireframe('cube2', getCuboid(10,200,10,10,40,20))
+        
+    g.scale(0.5)
+    g.outputNodes()
+    g.outputEdges()
+    print g.findCentre()
