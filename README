@@ -1,0 +1,15 @@
+### Modules ###
+ wireframe.py
+ wireframeDisplay.py
+
+# wireframe.py
+
+ Module for creating a manipulating wireframe objects
+ Requires:  numpy
+
+# wireframeDisplay.py
+
+ Module for displaying wireframe objects on a Pygame screen
+ Requires:  wireframe
+            pygame
+            numpy

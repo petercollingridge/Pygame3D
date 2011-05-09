@@ -63,8 +63,8 @@ def getCuboid(x,y,z,w,h,d):
     cuboid.addNodes(np.array([[nx,ny,nz] for nx in (x-w,x+w) for ny in (y-h,y+h) for nz in (z-d,z+d)]))
     cuboid.addEdges([(n,n+4) for n in range(0,4)]+[(n,n+1) for n in range(0,8,2)]+[(n,n+2) for n in (0,1,4,5)])
     
-    return cuboid
 
+    return cuboid
 if __name__ == '__main__':
     cube = getCuboid(100,100,10,20,30,40)
     cube.translate(np.array([10,2,0]))
