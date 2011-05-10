@@ -6,6 +6,8 @@ class Edge:
         self.stop  = stop
 
 class Wireframe:
+    """ An array of 3D vectors and connecting edges """
+    
     def __init__(self):
         self.nodes = np.zeros((0,3))
         self.edges = []
@@ -17,6 +19,10 @@ class Wireframe:
         for (start, stop) in edgeList:
             self.edges.append(Edge(self.nodes[start], self.nodes[stop]))
     
+    def output(self):
+        self.outputNodes()
+        self.outputEdges()    
+    
     def outputNodes(self):
         for i, node in enumerate(self.nodes):
             print "Node %d: (%d, %d, %d)" % (i, node[0], node[1], node[2])
@@ -27,13 +33,14 @@ class Wireframe:
             print "to (%d, %d, %d)" % (edge.stop[0],  edge.stop[1],  edge.stop[2])    
     
     def translate(self, v):
+        """ Translate by vector, v. """
         self.nodes += v
     
-    def scale(self, scale, cx=0, cy=0, cz=0):
-        """ Scale relative to the origin then translate to centre given point """
+    def scale(self, scale, x=0, y=0, z=0):
+        """ Scale relative to the origin then translate to given point, (x,y,z). """
         
         self.nodes *= np.array([scale, scale, scale])
-        self.translate(np.array([(1-scale)*cx, (scale-1)*-cy, (1-scale)*-cz]))
+        self.translate(np.array([(1-scale)*x, (scale-1)*-y, (1-scale)*-z]))
     
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
@@ -44,11 +51,18 @@ class Wireframe:
         return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
 
 class WireframeGroup:
+    """ A dictionary of wireframes and methods to manipulate them all together """
+    
     def __init__(self):
         self.wireframes = {}
     
     def addWireframe(self, name, wireframe):
         self.wireframes[name] = wireframe
+    
+    def output(self):
+        for name, wireframe in self.wireframes.items():
+            print name
+            wireframe.output()    
     
     def outputNodes(self):
         for name, wireframe in self.wireframes.items():
@@ -66,11 +80,11 @@ class WireframeGroup:
         for wireframe in self.wireframes.values():
             wireframe.translate(v)
 
-    def scale(self, scale, cx, cy, cz):
-        """ Scale wireframes in all directions from a given centre. """
+    def scale(self, scale, (x, y, z)):
+        """ Scale wireframes in all directions from a given point, (x,y,z). """
         
         for wireframe in self.wireframes.values():
-            wireframe.scale(scale, cx, cy, cz)
+            wireframe.scale(scale, x, y, z)
     
     def findCentre(self):
         """ Find the central point of all the wireframes. """
@@ -79,8 +93,8 @@ class WireframeGroup:
         max_values = [max((wireframe.nodes[:,n].max() for wireframe in self.wireframes.values())) for n in range(3)]
         
         return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
-
-def getCuboid(x,y,z,w,h,d):
+    
+def getCuboid((x,y,z), (w,h,d)):
     """ Return a wireframe cuboid centred on (x,y,z)
         with width, w, height, h, and depth, d. """
 
@@ -88,14 +102,4 @@ def getCuboid(x,y,z,w,h,d):
     cuboid.addNodes(np.array([[nx,ny,nz] for nx in (x-w,x+w) for ny in (y-h,y+h) for nz in (z-d,z+d)]))
     cuboid.addEdges([(n,n+4) for n in range(0,4)]+[(n,n+1) for n in range(0,8,2)]+[(n,n+2) for n in (0,1,4,5)])
     
-
     return cuboid
-if __name__ == '__main__':
-    g = WireframeGroup()
-    g.addWireframe('cube1', getCuboid(100,100,10,20,30,40))
-    g.addWireframe('cube2', getCuboid(10,200,10,10,40,20))
-        
-    g.scale(0.5)
-    g.outputNodes()
-    g.outputEdges()
-    print g.findCentre()

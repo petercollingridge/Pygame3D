@@ -11,12 +11,14 @@ key_to_function = {
     pygame.K_MINUS:  (lambda x: x.scale(0.8))}
 
 class WireframeViewer(wireframe.WireframeGroup):
-    def __init__(self, width, height):
+    """ A group of wireframes which can be displayed on a Pygame screen """
+    
+    def __init__(self, width, height, name="Wireframe Viewer"):
         self.width = width
         self.height = height
         
         self.screen = pygame.display.set_mode((width, height))
-        pygame.display.set_caption('Cell Display')
+        pygame.display.set_caption(name)
         
         self.wireframes = {}
         self.wireframe_colours = {}
@@ -62,25 +64,15 @@ class WireframeViewer(wireframe.WireframeGroup):
         if key in key_to_function:
             key_to_function[key](self)
 
-def runDisplay():
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                wv.keyEvent(event.key)
-
-        wv.display()  
-        pygame.display.flip()
-
-if __name__ == '__main__':  
-    width, height = 400, 300
-    screen = pygame.display.set_mode((width, height))
-    pygame.display.set_caption('Wireframe Display')
-    
-    wv = WireframeViewer(width, height)
-    wv.addWireframe('cube1',  wireframe.getCuboid(100,100,100,20,30,40))
-    wv.addWireframe('cube2',  wireframe.getCuboid( 20,200, 10,10,40,20))
-    
-    runDisplay()
+    def run(self):
+        """ Display wireframe on screen and respond to keydown events """
+        
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.KEYDOWN:
+                    self.keyEvent(event.key)
+            
+            self.display()
