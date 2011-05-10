@@ -11,6 +11,13 @@ def testWireframes():
     
     cuboid = wf.getCuboid((100,100,10), (20,30,40))
     cuboid.output()
+    print cuboid.nodes
+
+def testWireframeRotate():
+    cuboid = wf.getCuboid((100,100,10), (20,30,40))
+    cuboid.output()
+    cuboid.rotateX(0, 0, 0.2)
+    cuboid.output()
 
 def testWireframeGroup():
     """ Create a group of wireframes consisting of two cuboids """
@@ -26,6 +33,7 @@ def testWireframeDisplay():
     viewer.addWireframe('cube2',  wf.getCuboid(( 10,200,10), (10,40,20)))
     viewer.run()
 
-testWireframes()
-testWireframeGroup()
+#testWireframes()
+#testWireframeRotate()
+#testWireframeGroup()
 testWireframeDisplay()

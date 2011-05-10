@@ -37,6 +37,44 @@ class Wireframe:
         self.nodes *= np.array([scale, scale, scale])
         self.translate(np.array([(1-scale)*x, (scale-1)*-y, (1-scale)*-z]))
     
+    def rotateX(self, y, z, radians):
+        """ Rotate wireframe about the x-axis by 'radians' radians """
+        
+        # Combine translation and rotation with 4D array
+        # Used np.matrix instead of np.array?
+        
+        # Translate to y, z
+        self.translate([0, -y, -z])
+        
+        # Rotate about x
+        rotation_matrix = np.array([[1, 0,               0               ],
+                                    [0, np.cos(radians), -np.sin(radians)],
+                                    [0, np.sin(radians),  np.cos(radians)]])
+        self.nodes = np.dot(self.nodes, rotation_matrix)
+        
+        # Translate back
+        self.translate([0, y, z])
+        
+    def rotateY(self, x, z, radians):
+        """ Rotate wireframe about the y-axis by 'radians' radians """
+        
+        self.translate([-x, 0, -z])
+        rotation_matrix = np.array([[np.cos(radians),  0, np.sin(radians)],
+                                    [0,                1, 0              ],
+                                    [-np.sin(radians), 0, np.cos(radians)]])
+        self.nodes = np.dot(self.nodes, rotation_matrix)
+        self.translate([x, 0, z])
+        
+    def rotateZ(self, x, y, radians):
+        """ Rotate wireframe about the z-axis by 'radians' radians """
+        
+        self.translate([-x, -y, 0])
+        rotation_matrix = np.array([[np.cos(radians), -np.sin(radians), 0],
+                                    [np.sin(radians),  np.cos(radians), 0],
+                                    [0,                0,               1]])
+        self.nodes = np.dot(self.nodes, rotation_matrix)
+        self.translate([x, y, 0])
+    
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
 
@@ -80,6 +118,33 @@ class WireframeGroup:
         
         for wireframe in self.wireframes.values():
             wireframe.scale(scale, x, y, z)
+    
+    def rotateX(self, radians):
+        """ Rotate wireframes by 'radians' radians
+            about a vector parallel to x-axis and passing through the centre of the wireframes """
+        
+        (cx, cy, cz) = self.findCentre()
+        
+        for wireframe in self.wireframes.values():
+            wireframe.rotateX(cy, cz, radians)
+        
+    def rotateY(self, radians):
+        """ Rotate wireframes by 'radians' radians
+            about a vector parallel to y-axis and passing through the centre of the wireframes """
+        
+        (cx, cy, cz) = self.findCentre()
+        
+        for wireframe in self.wireframes.values():
+            wireframe.rotateY(cx, cz, radians)
+        
+    def rotateZ(self, radians):
+        """ Rotate wireframes by 'radians' radians
+            about a vector parallel to y-axis and passing through the centre of the wireframes """
+        
+        (cx, cy, cz) = self.findCentre()
+        
+        for wireframe in self.wireframes.values():
+            wireframe.rotateZ(cx, cy, radians)
     
     def findCentre(self):
         """ Find the central point of all the wireframes. """
