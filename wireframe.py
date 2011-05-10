@@ -1,10 +1,5 @@
 import numpy as np
 
-class Edge:
-    def __init__(self, start, stop):
-        self.start = start
-        self.stop  = stop
-
 class Wireframe:
     """ An array of 3D vectors and connecting edges """
     
@@ -15,9 +10,10 @@ class Wireframe:
     def addNodes(self, node_array):
         self.nodes = np.vstack((self.nodes, node_array))
     
-    def addEdges(self, edgeList):
-        for (start, stop) in edgeList:
-            self.edges.append(Edge(self.nodes[start], self.nodes[stop]))
+    def addEdges(self, edge_list):
+        # Is it better to use a for loop or generate a long list then add it?
+        # Should raise exception if edge value > len(self.nodes)
+        self.edges += [edge for edge in edge_list if edge not in self.edges]
     
     def output(self):
         self.outputNodes()
@@ -26,11 +22,10 @@ class Wireframe:
     def outputNodes(self):
         for i, node in enumerate(self.nodes):
             print "Node %d: (%d, %d, %d)" % (i, node[0], node[1], node[2])
-            
+
     def outputEdges(self):
         for i, edge in enumerate(self.edges):
-            print "Edge %d: (%d, %d, %d)" % (i, edge.start[0], edge.start[1], edge.start[2]),
-            print "to (%d, %d, %d)" % (edge.stop[0],  edge.stop[1],  edge.stop[2])    
+            print "Edge %d: %d -> %d" % (i, edge[0], edge[1])  
     
     def translate(self, v):
         """ Translate by vector, v. """

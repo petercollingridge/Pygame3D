@@ -31,7 +31,8 @@ class WireframeViewer(wireframe.WireframeGroup):
         self.nodeRadius = 4
     
     def addWireframe(self, name, wireframe):
-        self.wireframes[name] = wireframe  
+        self.wireframes[name] = wireframe
+        #   If colour is set to None, then wireframe is not displayed
         self.wireframe_colours[name] = (250,250,250)
     
     def addWireframeGroup(self, wireframe_group):
@@ -51,8 +52,8 @@ class WireframeViewer(wireframe.WireframeGroup):
         for name, wireframe in self.wireframes.items():
             colour = self.wireframe_colours.get(name)
             if colour:
-                for edge in wireframe.edges:
-                    pygame.draw.aaline(self.screen, colour, (edge.start[0], edge.start[1]), (edge.stop[0], edge.stop[1]), 1)
+               for (n1, n2) in wireframe.edges:
+                    pygame.draw.aaline(self.screen, colour, (wireframe.nodes[n1][0], wireframe.nodes[n1][1]), (wireframe.nodes[n2][0], wireframe.nodes[n2][1]), 1)
             
             if self.displayNodes:
                 for node in wireframe.nodes:

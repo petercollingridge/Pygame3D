@@ -26,6 +26,6 @@ def testWireframeDisplay():
     viewer.addWireframe('cube2',  wf.getCuboid(( 10,200,10), (10,40,20)))
     viewer.run()
 
-#testWireframes()
-#testWireframeGroup()
+testWireframes()
+testWireframeGroup()
 testWireframeDisplay()
