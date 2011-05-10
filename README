@@ -1,15 +1,22 @@
 ### Modules ###
  wireframe.py
  wireframeDisplay.py
+ examples.py
 
-# wireframe.py
+> wireframe.py
 
- Module for creating a manipulating wireframe objects
- Requires:  numpy
+ * Module for creating a manipulating wireframe objects
+    Requires:   numpy
 
-# wireframeDisplay.py
+> wireframeDisplay.py
 
- Module for displaying wireframe objects on a Pygame screen
- Requires:  wireframe
-            pygame
-            numpy
+ * Module for displaying wireframe objects on a Pygame screen
+    Requires:   wireframe
+                pygame
+                numpy
+
+> examples.py
+ * Module to demonstrate how to use the other module functions
+    Requires:   wireframe
+                wireframeDisplay 
+
