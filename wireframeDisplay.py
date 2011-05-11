@@ -36,6 +36,10 @@ class WireframeViewer(wf.WireframeGroup):
         self.displayNodes = False
         self.displayEdges = True
         
+        self.perspective = True
+        self.eyeX = self.width/2
+        self.eyeY = 100
+        
         self.background = (10,10,50)
         self.nodeColour = (250,250,250)
         self.nodeRadius = 4
@@ -63,11 +67,22 @@ class WireframeViewer(wf.WireframeGroup):
             colour = self.wireframe_colours.get(name)
             if colour:
                for (n1, n2) in wireframe.edges:
-                    pygame.draw.aaline(self.screen, colour, (wireframe.nodes[n1][0], wireframe.nodes[n1][1]), (wireframe.nodes[n2][0], wireframe.nodes[n2][1]), 1)
+                    if self.perspective:
+                        z1 = 200./ (200+wireframe.nodes[n1][2])
+                        x1 = self.width/2+z1*(wireframe.nodes[n1][0] - self.eyeX)
+                        y1 = 100+z1*(wireframe.nodes[n1][1] - self.eyeY)
+                        
+                        z2 = 200./ (200+wireframe.nodes[n2][2])
+                        x2 = self.width/2+z2*(wireframe.nodes[n2][0] - self.eyeX)
+                        y2 = 100+z2*(wireframe.nodes[n2][1] - self.eyeY)
+                        
+                        pygame.draw.aaline(self.screen, colour, (x1, y1), (x2, y2), 1)
+                    else:
+                        pygame.draw.aaline(self.screen, colour, (wireframe.nodes[n1][0], wireframe.nodes[n1][1]), (wireframe.nodes[n2][0], wireframe.nodes[n2][1]), 1)
             
             if self.displayNodes:
                 for node in wireframe.nodes:
-                    pygame.draw.circle(self.screen, colour, (int(node[0]), int(node[y])), self.nodeRadius, 0)
+                    pygame.draw.circle(self.screen, colour, (int(node[0]), int(node[1])), self.nodeRadius, 0)
         
         pygame.display.flip()
 
