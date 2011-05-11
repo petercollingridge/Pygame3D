@@ -155,11 +155,11 @@ class WireframeGroup:
         return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
     
 def getCuboid((x,y,z), (w,h,d)):
-    """ Return a wireframe cuboid centred on (x,y,z)
+    """ Return a wireframe cuboid starting at (x,y,z)
         with width, w, height, h, and depth, d. """
 
     cuboid = Wireframe()
-    cuboid.addNodes(np.array([[nx,ny,nz] for nx in (x-w,x+w) for ny in (y-h,y+h) for nz in (z-d,z+d)]))
+    cuboid.addNodes(np.array([[nx,ny,nz] for nx in (x,x+w) for ny in (y,y+h) for nz in (z,z+d)]))
     cuboid.addEdges([(n,n+4) for n in range(0,4)]+[(n,n+1) for n in range(0,8,2)]+[(n,n+2) for n in (0,1,4,5)])
     
     return cuboid
