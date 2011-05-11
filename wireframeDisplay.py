@@ -32,6 +32,7 @@ class WireframeViewer(wf.WireframeGroup):
         
         self.wireframes = {}
         self.wireframe_colours = {}
+        self.object_to_update = []
         
         self.displayNodes = False
         self.displayEdges = True
@@ -103,3 +104,4 @@ class WireframeViewer(wf.WireframeGroup):
                     self.keyEvent(event.key)
             
             self.display()
+            self.update()

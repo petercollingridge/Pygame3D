@@ -82,6 +82,10 @@ class Wireframe:
         max_values = [self.nodes[:,n].max() for n in range(3)]
         
         return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
+    
+    def update(self):
+        """ Override this function to control wireframe behaviour """
+        pass
 
 class WireframeGroup:
     """ A dictionary of wireframes and methods to manipulate them all together """
@@ -162,6 +166,10 @@ class WireframeGroup:
         max_values = [max((wireframe.nodes[:,n].max() for wireframe in self.wireframes.values())) for n in range(3)]
         
         return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
+    
+    def update(self):
+        for wireframe in self.wireframes.values():
+            wireframe.update()
     
 def getCuboid((x,y,z), (w,h,d)):
     """ Return a wireframe cuboid starting at (x,y,z)
