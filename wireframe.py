@@ -163,3 +163,37 @@ def getCuboid((x,y,z), (w,h,d)):
     cuboid.addEdges([(n,n+4) for n in range(0,4)]+[(n,n+1) for n in range(0,8,2)]+[(n,n+2) for n in (0,1,4,5)])
     
     return cuboid
+
+def getSpheroid((x,y,z), (rx, ry, rz), resolution=10):
+    """ Returns a wireframe spheroid centred on (x,y,z)
+        with a radius of (rx,ry,rz) in the respective axes. """
+    
+    spheriod = Wireframe()
+    latitudes  = [n*np.pi/resolution for n in range(1,resolution)]
+    longitudes = [n*2*np.pi/resolution for n in range(resolution)]
+
+    # Add nodes except for poles
+    spheriod.addNodes([(x + rx*np.sin(n)*np.sin(m), y - ry*np.cos(m), z - rz*np.cos(n)*np.sin(m)) for m in latitudes for n in longitudes])
+
+    # Add lines of latitudes
+    spheriod.addEdges([(n*resolution+m, n*resolution+(m+1)%resolution) for n in range(resolution-1) for m in range(resolution)])
+    
+    # Add lines of longitude (don't reach poles)
+    spheriod.addEdges([(n*resolution+m, (n+1)*resolution+m) for n in range(resolution-2) for m in range(resolution)])
+
+    # Add poles and joining edges
+    spheriod.addNodes([(x, y+ry, z),(x, y-ry, z)])
+    spheriod.addEdges([(len(spheriod.nodes)-1, n) for n in range(resolution)])
+    spheriod.addEdges([(len(spheriod.nodes)-2, len(spheriod.nodes)-3-n) for n in range(resolution)])
+
+    return spheriod
+
+def getHorizontalGrid((x,y,z), (dx,dz), (nx,nz)):
+    """ Returns a nx by nz wireframe grid that starts at (x,y,z) with width dx.nx and depth dz.nz. """
+    
+    grid = Wireframe()
+    grid.addNodes(np.array([[x+n1*dx, y, z+n2*dz] for n1 in range(nx+1) for n2 in range(nz+1)]))
+    grid.addEdges([(n1*(nz+1)+n2,n1*(nz+1)+n2+1) for n1 in range(nx+1) for n2 in range(nz)])
+    grid.addEdges([(n1*(nz+1)+n2,(n1+1)*(nz+1)+n2) for n1 in range(nx) for n2 in range(nz+1)])
+    
+    return grid
