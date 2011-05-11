@@ -119,29 +119,38 @@ class WireframeGroup:
         for wireframe in self.wireframes.values():
             wireframe.scale(scale, x, y, z)
     
-    def rotateX(self, radians):
+    def rotateX(self, radians, centre = None):
         """ Rotate wireframes by 'radians' radians
             about a vector parallel to x-axis and passing through the centre of the wireframes """
         
-        (cx, cy, cz) = self.findCentre()
+        if not centre:
+            (cx, cy, cz) = self.findCentre()
+        else:
+            (cy, cz) = centre
         
         for wireframe in self.wireframes.values():
             wireframe.rotateX(cy, cz, radians)
         
-    def rotateY(self, radians):
+    def rotateY(self, radians, centre = None):
         """ Rotate wireframes by 'radians' radians
             about a vector parallel to y-axis and passing through the centre of the wireframes """
         
-        (cx, cy, cz) = self.findCentre()
+        if not centre:
+            (cx, cy, cz) = self.findCentre()
+        else:
+            (cx, cz) = centre
         
         for wireframe in self.wireframes.values():
             wireframe.rotateY(cx, cz, radians)
         
-    def rotateZ(self, radians):
+    def rotateZ(self, radians, centre = None):
         """ Rotate wireframes by 'radians' radians
             about a vector parallel to y-axis and passing through the centre of the wireframes """
         
-        (cx, cy, cz) = self.findCentre()
+        if not centre:
+            (cx, cy, cz) = self.findCentre()
+        else:
+            (cx, cy) = centre
         
         for wireframe in self.wireframes.values():
             wireframe.rotateZ(cx, cy, radians)

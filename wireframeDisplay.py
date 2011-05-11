@@ -36,7 +36,7 @@ class WireframeViewer(wf.WireframeGroup):
         self.displayNodes = False
         self.displayEdges = True
         
-        self.perspective = True
+        self.perspective = 300.
         self.eyeX = self.width/2
         self.eyeY = 100
         
@@ -68,15 +68,16 @@ class WireframeViewer(wf.WireframeGroup):
             if colour:
                for (n1, n2) in wireframe.edges:
                     if self.perspective:
-                        z1 = 200./ (200+wireframe.nodes[n1][2])
-                        x1 = self.width/2+z1*(wireframe.nodes[n1][0] - self.eyeX)
-                        y1 = 100+z1*(wireframe.nodes[n1][1] - self.eyeY)
-                        
-                        z2 = 200./ (200+wireframe.nodes[n2][2])
-                        x2 = self.width/2+z2*(wireframe.nodes[n2][0] - self.eyeX)
-                        y2 = 100+z2*(wireframe.nodes[n2][1] - self.eyeY)
-                        
-                        pygame.draw.aaline(self.screen, colour, (x1, y1), (x2, y2), 1)
+                        if wireframe.nodes[n1][2] > -self.perspective and wireframe.nodes[n2][2] > -self.perspective:
+                            z1 = self.perspective/ (self.perspective+wireframe.nodes[n1][2])
+                            x1 = self.width/2  + z1*(wireframe.nodes[n1][0] - self.width/2)
+                            y1 = self.height/2 + z1*(wireframe.nodes[n1][1] - self.height/2)
+                
+                            z2 = self.perspective/ (self.perspective+wireframe.nodes[n2][2])
+                            x2 = self.width/2  + z2*(wireframe.nodes[n2][0] - self.width/2)
+                            y2 = self.height/2 + z2*(wireframe.nodes[n2][1] - self.height/2)
+                            
+                            pygame.draw.aaline(self.screen, colour, (x1, y1), (x2, y2), 1)
                     else:
                         pygame.draw.aaline(self.screen, colour, (wireframe.nodes[n1][0], wireframe.nodes[n1][1]), (wireframe.nodes[n2][0], wireframe.nodes[n2][1]), 1)
             
