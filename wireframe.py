@@ -78,10 +78,10 @@ class Wireframe:
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
 
-        min_values = [self.nodes[:,n].min() for n in range(3)]
-        max_values = [self.nodes[:,n].max() for n in range(3)]
-        
-        return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
+        min_values = self.nodes.min(axis=0)
+        max_values = self.nodes.max(axis=0)
+
+        return 0.5*(min_values[n] + max_values[n])
     
     def update(self):
         """ Override this function to control wireframe behaviour """
@@ -162,9 +162,10 @@ class WireframeGroup:
     def findCentre(self):
         """ Find the central point of all the wireframes. """
         
-        min_values = [min((wireframe.nodes[:,n].min() for wireframe in self.wireframes.values())) for n in range(3)]
-        max_values = [max((wireframe.nodes[:,n].max() for wireframe in self.wireframes.values())) for n in range(3)]
-        
+        # There may be a more efficient way to find the minimums for a group of wireframes
+        min_values = np.array([wireframe.nodes.min(axis=0) for wireframe in self.wireframes.values()]).min(axis=0)
+        max_values = np.array([wireframe.nodes.max(axis=0) for wireframe in self.wireframes.values()]).max(axis=0)
+
         return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
     
     def update(self):
