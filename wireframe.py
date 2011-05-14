@@ -4,11 +4,13 @@ class Wireframe:
     """ An array of 3D vectors and connecting edges """
     
     def __init__(self):
-        self.nodes = np.zeros((0,3))
+        self.nodes = np.zeros((0,4))
         self.edges = []
 
     def addNodes(self, node_array):
-        self.nodes = np.vstack((self.nodes, node_array))
+        """ Append 1s to a list of 3-tuples and add to self.nodes """
+        nodes_plus_one = np.hstack((node_array, np.ones((len(node_array),1))))
+        self.nodes = np.vstack((self.nodes, nodes_plus_one))
     
     def addEdges(self, edge_list):
         # Is it better to use a for loop or generate a long list then add it?
@@ -27,9 +29,14 @@ class Wireframe:
         for i, edge in enumerate(self.edges):
             print "Edge %d: %d -> %d" % (i, edge[0], edge[1])  
     
-    def translate(self, v):
+    def transform(self, transformation_matrix):
+        """ Apply a transformation defined by a transformation matrix """
+        self.nodes = np.dot(self.nodes, transformation_matrix)
+    
+    def translate(self, dx, dy, dz):
         """ Translate by vector, v. """
-        self.nodes += v
+        transformation_matrix = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[dx,dy,dz,1]])
+        self.nodes = np.dot(self.nodes ,transformation_matrix)
     
     def scale(self, scale, x=0, y=0, z=0):
         """ Scale relative to the origin then translate to given point, (x,y,z). """

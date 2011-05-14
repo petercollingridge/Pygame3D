@@ -13,12 +13,12 @@ def testWireframes():
     cuboid.output()
     print cuboid.nodes
 
-def testWireframeRotate():
+def testTransformations():
     """" Creates a cuboid and rotates it about the x-axis. """
     
     cuboid = wf.getCuboid((100,100,10), (20,30,40))
     cuboid.output()
-    cuboid.rotateX(0, 0, 0.2)
+    cuboid.translate(4, 3, 1)
     cuboid.output()
 
 def testWireframeGroup():
@@ -40,6 +40,6 @@ def testWireframeDisplay():
     viewer.run()
 
 #testWireframes()
-#testWireframeRotate()
+testTransformations()
 #testWireframeGroup()
-testWireframeDisplay()
+#testWireframeDisplay()
