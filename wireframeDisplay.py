@@ -3,20 +3,21 @@ import numpy as np
 import wireframe as wf
 
 # Radian rotated by a key event
-rotation_amount = math.pi/64
+rotation_amount = math.pi/32
+movement_amount = 10
 
 key_to_function = {
-    pygame.K_LEFT:   (lambda x: x.translate(np.array([-10,  0, 0]))),
-    pygame.K_RIGHT:  (lambda x: x.translate(np.array([ 10,  0, 0]))),
-    pygame.K_UP:     (lambda x: x.translate(np.array([  0,-10, 0]))),
-    pygame.K_DOWN:   (lambda x: x.translate(np.array([  0, 10, 0]))),
+    pygame.K_LEFT:   (lambda x: x.translate(dx=-movement_amount)),
+    pygame.K_RIGHT:  (lambda x: x.translate(dx= movement_amount)),
+    pygame.K_UP:     (lambda x: x.translate(dy=-movement_amount)),
+    pygame.K_DOWN:   (lambda x: x.translate(dy= movement_amount)),
     pygame.K_EQUALS: (lambda x: x.scale(1.25)),
     pygame.K_MINUS:  (lambda x: x.scale(0.8)),
-    pygame.K_q:      (lambda x: x.rotateX(rotation_amount)),
+    pygame.K_q:      (lambda x: x.rotateX( rotation_amount)),
     pygame.K_w:      (lambda x: x.rotateX(-rotation_amount)),
-    pygame.K_a:      (lambda x: x.rotateY(rotation_amount)),
+    pygame.K_a:      (lambda x: x.rotateY( rotation_amount)),
     pygame.K_s:      (lambda x: x.rotateY(-rotation_amount)),
-    pygame.K_z:      (lambda x: x.rotateZ(rotation_amount)),
+    pygame.K_z:      (lambda x: x.rotateZ( rotation_amount)),
     pygame.K_x:      (lambda x: x.rotateZ(-rotation_amount))
     }
 

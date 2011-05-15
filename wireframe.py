@@ -33,34 +33,27 @@ class Wireframe:
         """ Apply a transformation defined by a transformation matrix """
         self.nodes = np.dot(self.nodes, transformation_matrix)
     
-    def translate(self, dx, dy, dz):
-        """ Translate by vector, v. """
-        transformation_matrix = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[dx,dy,dz,1]])
-        self.nodes = np.dot(self.nodes ,transformation_matrix)
+    def translate(self, dx=0, dy=0, dz=0):
+        """ Translate by vector [dx, dy, dz] """
+        self.nodes = np.dot(self.nodes, np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[dx,dy,dz,1]]))
     
-    def scale(self, scale, x=0, y=0, z=0):
-        """ Scale relative to the origin then translate to given point, (x,y,z). """
-        
-        self.nodes *= np.array([scale, scale, scale])
-        self.translate(np.array([(1-scale)*x, (scale-1)*-y, (1-scale)*-z]))
+    def scale(self, scale, cx=0, cy=0, cz=0):
+        """ Scale equally along all axes centred on the point (cx,cy,cz). """
+        self.nodes = np.dot(self.nodes, np.array([[scale,0,0,0],[0,scale,0,0],[0,0,scale,0],[cx*(1-scale),cy*(1-scale),cz*(1-scale),1]]))
     
     def rotateX(self, y, z, radians):
         """ Rotate wireframe about the x-axis by 'radians' radians """
         
-        # Combine translation and rotation with 4D array
-        # Used np.matrix instead of np.array?
-        
-        # Translate to y, z
-        self.translate([0, -y, -z])
-        
-        # Rotate about x
-        rotation_matrix = np.array([[1, 0,               0               ],
-                                    [0, np.cos(radians), -np.sin(radians)],
-                                    [0, np.sin(radians),  np.cos(radians)]])
-        self.nodes = np.dot(self.nodes, rotation_matrix)
-        
-        # Translate back
-        self.translate([0, y, z])
+        c = np.cos(radians)
+        s = np.sin(radians)
+        translation_matrix2 = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, y, z,1]])
+        rotation_matrix = np.array([[1,        0,       0, 0],
+                                    [0,        c,      -s, 0],
+                                    [0,        s,       c, 0],
+                                    [0, -y*c-z*s, y*s-z*c, 1]])
+
+        transformation_matrix = np.dot(rotation_matrix, translation_matrix2)
+        self.nodes = np.dot(self.nodes, transformation_matrix)
         
     def rotateY(self, x, z, radians):
         """ Rotate wireframe about the y-axis by 'radians' radians """
@@ -85,10 +78,9 @@ class Wireframe:
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
 
-        min_values = self.nodes.min(axis=0)
-        max_values = self.nodes.max(axis=0)
-
-        return 0.5*(min_values[n] + max_values[n])
+        min_values = self.nodes[:,:-1].min(axis=0)
+        max_values = self.nodes[:,:-1].max(axis=0)
+        return 0.5*(min_values + max_values)
     
     def update(self):
         """ Override this function to control wireframe behaviour """
@@ -118,11 +110,11 @@ class WireframeGroup:
             print name
             wireframe.outputEdges()
     
-    def translate(self, v):
-        """ Translate each node of each wireframe by a vector, v. """
+    def translate(self, dx=0, dy=0, dz=0):
+        """ Translate by vector [dx, dy, dz] """
         
         for wireframe in self.wireframes.values():
-            wireframe.translate(v)
+            wireframe.translate(dx, dy, dz)
 
     def scale(self, scale, (x, y, z)):
         """ Scale wireframes in all directions from a given point, (x,y,z). """
