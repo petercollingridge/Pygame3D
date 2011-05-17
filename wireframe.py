@@ -37,49 +37,43 @@ class Wireframe:
         """ Translate by vector [dx, dy, dz] """
         self.nodes = np.dot(self.nodes, np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[dx,dy,dz,1]]))
     
-    def scale(self, scale, cx=0, cy=0, cz=0):
+    def scale(self, s, cx=0, cy=0, cz=0):
         """ Scale equally along all axes centred on the point (cx,cy,cz). """
-        self.nodes = np.dot(self.nodes, np.array([[scale,        0,            0,            0],
-                                                  [0,            scale,        0,            0],
-                                                  [0,            0,            scale,        0],
-                                                  [cx*(1-scale), cy*(1-scale), cz*(1-scale), 1]]))
+        self.nodes = np.dot(self.nodes, np.array([[s, 0, 0, 0],
+                                                  [0, s, 0, 0],
+                                                  [0, 0, s, 0],
+                                                  [cx*(1-s), cy*(1-s), cz*(1-s), 1]]))
     
     def rotateX(self, y, z, radians):
         """ Rotate wireframe about the x-axis by 'radians' radians """
         
         c = np.cos(radians)
         s = np.sin(radians)
-        rotation_matrix = np.array([[1,        0,       0, 0],
-                                    [0,        c,      -s, 0],
-                                    [0,        s,       c, 0],
-                                    [0, -y*c-z*s, y*s-z*c, 1]])
-
-        transformation_matrix = np.dot(rotation_matrix, np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, y, z,1]]))
-        self.nodes = np.dot(self.nodes, transformation_matrix)
+        self.nodes = np.dot(self.nodes, np.array([[1, 0, 0, 0],
+                                                 [0, c,-s, 0],
+                                                 [0, s, c, 0],
+                                                 [0, -y*c-z*s+y, y*s-z*c+z, 1]]))
         
     def rotateY(self, x, z, radians):
         """ Rotate wireframe about the y-axis by 'radians' radians """
         
         c = np.cos(radians)
         s = np.sin(radians)
-        rotation_matrix = np.array([[ c,       0,        s, 0],
-                                    [ 0,       1,        0, 0],
-                                    [-s,       0,        c, 0],
-                                    [ z*s-x*c, 0, -z*c-x*s, 1]])
-        self.nodes = np.dot(self.nodes, rotation_matrix)
-        self.translate(dx=x, dz=z)
+        self.nodes = np.dot(self.nodes, np.array([[ c, 0, s, 0],
+                                                  [ 0, 1, 0, 0],
+                                                  [-s, 0, c, 0],
+                                                  [ z*s-x*c+x, 0, -z*c-x*s+z, 1]]))
         
     def rotateZ(self, x, y, radians):
         """ Rotate wireframe about the z-axis by 'radians' radians """
         
         c = np.cos(radians)
         s = np.sin(radians)
-        rotation_matrix = np.array([[c,       -s,       0, 0],
-                                    [s,        c,       0, 0],
-                                    [0,        0,       1, 0],
-                                    [-x*c-y*s, x*s-c*y, 0, 1]])
+        rotation_matrix = np.array([[c,-s, 0, 0],
+                                    [s, c, 0, 0],
+                                    [0, 0, 1, 0],
+                                    [-x*c-y*s+x, x*s-c*y+y, 0, 1]])
         self.nodes = np.dot(self.nodes, rotation_matrix)
-        self.translate(dx=x, dy=y)
     
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
@@ -168,10 +162,9 @@ class WireframeGroup:
         """ Find the central point of all the wireframes. """
         
         # There may be a more efficient way to find the minimums for a group of wireframes
-        min_values = np.array([wireframe.nodes.min(axis=0) for wireframe in self.wireframes.values()]).min(axis=0)
-        max_values = np.array([wireframe.nodes.max(axis=0) for wireframe in self.wireframes.values()]).max(axis=0)
-
-        return [0.5*(min_values[n] + max_values[n]) for n in range(3)]
+        min_values = np.array([wireframe.nodes[:,:-1].min(axis=0) for wireframe in self.wireframes.values()]).min(axis=0)
+        max_values = np.array([wireframe.nodes[:,:-1].max(axis=0) for wireframe in self.wireframes.values()]).max(axis=0)
+        return 0.5*(min_values + max_values)
     
     def update(self):
         for wireframe in self.wireframes.values():
