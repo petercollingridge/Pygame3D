@@ -6,6 +6,7 @@ class Wireframe:
     def __init__(self):
         self.nodes = np.zeros((0,4))
         self.edges = []
+        self.faces = []
 
     def addNodes(self, node_array):
         """ Append 1s to a list of 3-tuples and add to self.nodes """
@@ -16,6 +17,13 @@ class Wireframe:
         # Is it better to use a for loop or generate a long list then add it?
         # Should raise exception if edge value > len(self.nodes)
         self.edges += [edge for edge in edge_list if edge not in self.edges]
+
+    def addFaces(self, face_list):
+        for node_list in face_list:
+            num_nodes = len(node_list)
+            if all((node < len(self.nodes) for node in node_list)):
+                self.faces.append([self.nodes[node] for node in node_list])
+                self.addEdges([(node_list[n], node_list[(n+1)%num_nodes]) for n in range(num_nodes)])
     
     def output(self):
         self.outputNodes()
@@ -50,9 +58,9 @@ class Wireframe:
         c = np.cos(radians)
         s = np.sin(radians)
         self.nodes = np.dot(self.nodes, np.array([[1, 0, 0, 0],
-                                                 [0, c,-s, 0],
-                                                 [0, s, c, 0],
-                                                 [0, -y*c-z*s+y, y*s-z*c+z, 1]]))
+                                                  [0, c,-s, 0],
+                                                  [0, s, c, 0],
+                                                  [0, -y*c-z*s+y, y*s-z*c+z, 1]]))
         
     def rotateY(self, x, z, radians):
         """ Rotate wireframe about the y-axis by 'radians' radians """

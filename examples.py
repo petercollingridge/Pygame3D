@@ -64,8 +64,18 @@ def testWireframeDisplay2():
     viewer.addWireframe('sphere', wf.getSpheroid((250,300, 100), (20,30,40)))
     viewer.run()
 
+def testSurface():
+    triangle = wf.Wireframe()
+    triangle.addNodes([[100,200,10], [200,200,10], [150,100,500],[100,300,20],[200,300,20]])
+    triangle.addFaces([(0,1,2), (0,1,4,3)])
+    
+    viewer = wd.WireframeViewer(600, 400)
+    viewer.addWireframe('triangle',  triangle)
+    viewer.run()
+
 #testWireframes()
 #testScale()
 #testRotate()
 #testWireframeGroup()
-testWireframeDisplay2()
+#testWireframeDisplay2()
+testSurface()
