@@ -39,41 +39,47 @@ class Wireframe:
     
     def scale(self, scale, cx=0, cy=0, cz=0):
         """ Scale equally along all axes centred on the point (cx,cy,cz). """
-        self.nodes = np.dot(self.nodes, np.array([[scale,0,0,0],[0,scale,0,0],[0,0,scale,0],[cx*(1-scale),cy*(1-scale),cz*(1-scale),1]]))
+        self.nodes = np.dot(self.nodes, np.array([[scale,        0,            0,            0],
+                                                  [0,            scale,        0,            0],
+                                                  [0,            0,            scale,        0],
+                                                  [cx*(1-scale), cy*(1-scale), cz*(1-scale), 1]]))
     
     def rotateX(self, y, z, radians):
         """ Rotate wireframe about the x-axis by 'radians' radians """
         
         c = np.cos(radians)
         s = np.sin(radians)
-        translation_matrix2 = np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, y, z,1]])
         rotation_matrix = np.array([[1,        0,       0, 0],
                                     [0,        c,      -s, 0],
                                     [0,        s,       c, 0],
                                     [0, -y*c-z*s, y*s-z*c, 1]])
 
-        transformation_matrix = np.dot(rotation_matrix, translation_matrix2)
+        transformation_matrix = np.dot(rotation_matrix, np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0, y, z,1]]))
         self.nodes = np.dot(self.nodes, transformation_matrix)
         
     def rotateY(self, x, z, radians):
         """ Rotate wireframe about the y-axis by 'radians' radians """
         
-        self.translate([-x, 0, -z])
-        rotation_matrix = np.array([[np.cos(radians),  0, np.sin(radians)],
-                                    [0,                1, 0              ],
-                                    [-np.sin(radians), 0, np.cos(radians)]])
+        c = np.cos(radians)
+        s = np.sin(radians)
+        rotation_matrix = np.array([[ c,       0,        s, 0],
+                                    [ 0,       1,        0, 0],
+                                    [-s,       0,        c, 0],
+                                    [ z*s-x*c, 0, -z*c-x*s, 1]])
         self.nodes = np.dot(self.nodes, rotation_matrix)
-        self.translate([x, 0, z])
+        self.translate(dx=x, dz=z)
         
     def rotateZ(self, x, y, radians):
         """ Rotate wireframe about the z-axis by 'radians' radians """
         
-        self.translate([-x, -y, 0])
-        rotation_matrix = np.array([[np.cos(radians), -np.sin(radians), 0],
-                                    [np.sin(radians),  np.cos(radians), 0],
-                                    [0,                0,               1]])
+        c = np.cos(radians)
+        s = np.sin(radians)
+        rotation_matrix = np.array([[c,       -s,       0, 0],
+                                    [s,        c,       0, 0],
+                                    [0,        0,       1, 0],
+                                    [-x*c-y*s, x*s-c*y, 0, 1]])
         self.nodes = np.dot(self.nodes, rotation_matrix)
-        self.translate([x, y, 0])
+        self.translate(dx=x, dy=y)
     
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
