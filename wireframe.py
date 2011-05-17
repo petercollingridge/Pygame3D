@@ -9,8 +9,8 @@ class Wireframe:
 
     def addNodes(self, node_array):
         """ Append 1s to a list of 3-tuples and add to self.nodes """
-        nodes_plus_one = np.hstack((node_array, np.ones((len(node_array),1))))
-        self.nodes = np.vstack((self.nodes, nodes_plus_one))
+        ones_added = np.hstack((node_array, np.ones((len(node_array),1))))
+        self.nodes = np.vstack((self.nodes, ones_added))
     
     def addEdges(self, edge_list):
         # Is it better to use a for loop or generate a long list then add it?

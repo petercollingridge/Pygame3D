@@ -68,4 +68,4 @@ def testWireframeDisplay2():
 #testScale()
 #testRotate()
 #testWireframeGroup()
-testWireframeDisplay()
+testWireframeDisplay2()
