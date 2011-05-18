@@ -77,11 +77,10 @@ class Wireframe:
         
         c = np.cos(radians)
         s = np.sin(radians)
-        rotation_matrix = np.array([[c,-s, 0, 0],
-                                    [s, c, 0, 0],
-                                    [0, 0, 1, 0],
-                                    [-x*c-y*s+x, x*s-c*y+y, 0, 1]])
-        self.nodes = np.dot(self.nodes, rotation_matrix)
+        self.nodes = np.dot(self.nodes, np.array([[c,-s, 0, 0],
+                                                  [s, c, 0, 0],
+                                                  [0, 0, 1, 0],
+                                                  [-x*c-y*s+x, x*s-c*y+y, 0, 1]]))
     
     def findCentre(self):
         """ Find the spatial centre by finding the range of the x, y and z coordinates. """
@@ -184,7 +183,9 @@ def getCuboid((x,y,z), (w,h,d)):
 
     cuboid = Wireframe()
     cuboid.addNodes(np.array([[nx,ny,nz] for nx in (x,x+w) for ny in (y,y+h) for nz in (z,z+d)]))
-    cuboid.addEdges([(n,n+4) for n in range(0,4)]+[(n,n+1) for n in range(0,8,2)]+[(n,n+2) for n in (0,1,4,5)])
+    cuboid.addFaces([(0,1,3,2), (4,5,7,6)])
+    cuboid.addFaces([(0,1,5,4), (2,3,7,6)])
+    cuboid.addFaces([(0,2,6,4), (1,3,7,5)])
     
     return cuboid
 
@@ -192,25 +193,24 @@ def getSpheroid((x,y,z), (rx, ry, rz), resolution=10):
     """ Returns a wireframe spheroid centred on (x,y,z)
         with a radius of (rx,ry,rz) in the respective axes. """
     
-    spheriod = Wireframe()
+    spheroid   = Wireframe()
     latitudes  = [n*np.pi/resolution for n in range(1,resolution)]
     longitudes = [n*2*np.pi/resolution for n in range(resolution)]
 
     # Add nodes except for poles
-    spheriod.addNodes([(x + rx*np.sin(n)*np.sin(m), y - ry*np.cos(m), z - rz*np.cos(n)*np.sin(m)) for m in latitudes for n in longitudes])
+    spheroid.addNodes([(x + rx*np.sin(n)*np.sin(m), y - ry*np.cos(m), z - rz*np.cos(n)*np.sin(m)) for m in latitudes for n in longitudes])
 
-    # Add lines of latitudes
-    spheriod.addEdges([(n*resolution+m, n*resolution+(m+1)%resolution) for n in range(resolution-1) for m in range(resolution)])
-    
-    # Add lines of longitude (don't reach poles)
-    spheriod.addEdges([(n*resolution+m, (n+1)*resolution+m) for n in range(resolution-2) for m in range(resolution)])
+    # Add square faces to whole spheroid but poles
+    num_nodes = resolution*(resolution-1)
+    spheroid.addFaces([(m+n, m+(n+1)%resolution, (m+resolution)%resolution**2+(n+1)%resolution, (m+resolution)%num_nodes+n) for n in range(resolution) for m in range(0,num_nodes-resolution,resolution)])
 
-    # Add poles and joining edges
-    spheriod.addNodes([(x, y+ry, z),(x, y-ry, z)])
-    spheriod.addEdges([(len(spheriod.nodes)-1, n) for n in range(resolution)])
-    spheriod.addEdges([(len(spheriod.nodes)-2, len(spheriod.nodes)-3-n) for n in range(resolution)])
+    # Add poles and triangular faces around poles
+    spheroid.addNodes([(x, y+ry, z),(x, y-ry, z)])
+    spheroid.addFaces([(num_nodes+1, (n+1)%resolution, n) for n in range(resolution)])
+    start_node = num_nodes-resolution
+    spheroid.addFaces([(num_nodes, start_node+n, start_node+(n+1)%resolution) for n in range(resolution)])
 
-    return spheriod
+    return spheroid
 
 def getHorizontalGrid((x,y,z), (dx,dz), (nx,nz)):
     """ Returns a nx by nz wireframe grid that starts at (x,y,z) with width dx.nx and depth dz.nz. """

@@ -47,7 +47,7 @@ def testWireframeGroup():
     g.addWireframe('cube2', wf.getCuboid(( 10,200,10), (10,40,20)))        
     g.output()
 
-def testWireframeDisplay():
+def testWireframeDisplay1():
     """ Create display with a cube """
     
     viewer = wd.WireframeViewer(600, 400)
@@ -77,5 +77,6 @@ def testSurface():
 #testScale()
 #testRotate()
 #testWireframeGroup()
-#testWireframeDisplay2()
-testSurface()
+#testWireframeDisplay1()
+testWireframeDisplay2()
+#testSurface()
