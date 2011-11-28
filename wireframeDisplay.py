@@ -3,22 +3,22 @@ import numpy as np
 import wireframe as wf
 
 # Radian rotated by a key event
-rotation_amount = math.pi/32
-movement_amount = 10
+ROTATION_AMOUNT = np.pi/32
+MOVEMENT_AMOUNT = 10
 
 key_to_function = {
-    pygame.K_LEFT:   (lambda x: x.translate(dx=-movement_amount)),
-    pygame.K_RIGHT:  (lambda x: x.translate(dx= movement_amount)),
-    pygame.K_UP:     (lambda x: x.translate(dy=-movement_amount)),
-    pygame.K_DOWN:   (lambda x: x.translate(dy= movement_amount)),
+    pygame.K_LEFT:   (lambda x: x.transform(wf.translationMatrix(dx=-MOVEMENT_AMOUNT))),
+    pygame.K_RIGHT:  (lambda x: x.transform(wf.translationMatrix(dx= MOVEMENT_AMOUNT))),
+    pygame.K_UP:     (lambda x: x.transform(wf.translationMatrix(dy=-MOVEMENT_AMOUNT))),
+    pygame.K_DOWN:   (lambda x: x.transform(wf.translationMatrix(dy= MOVEMENT_AMOUNT))),
     pygame.K_EQUALS: (lambda x: x.scale(1.25)),
     pygame.K_MINUS:  (lambda x: x.scale(0.8)),
-    pygame.K_q:      (lambda x: x.rotateX( rotation_amount)),
-    pygame.K_w:      (lambda x: x.rotateX(-rotation_amount)),
-    pygame.K_a:      (lambda x: x.rotateY( rotation_amount)),
-    pygame.K_s:      (lambda x: x.rotateY(-rotation_amount)),
-    pygame.K_z:      (lambda x: x.rotateZ( rotation_amount)),
-    pygame.K_x:      (lambda x: x.rotateZ(-rotation_amount))
+    pygame.K_q:      (lambda x: x.rotate('x', ROTATION_AMOUNT)),
+    pygame.K_w:      (lambda x: x.rotate('x',-ROTATION_AMOUNT)),
+    pygame.K_a:      (lambda x: x.rotate('y', ROTATION_AMOUNT)),
+    pygame.K_s:      (lambda x: x.rotate('y',-ROTATION_AMOUNT)),
+    pygame.K_z:      (lambda x: x.rotate('z', ROTATION_AMOUNT)),
+    pygame.K_x:      (lambda x: x.rotate('z',-ROTATION_AMOUNT))
     }
 
 class WireframeViewer(wf.WireframeGroup):
@@ -59,8 +59,23 @@ class WireframeViewer(wf.WireframeGroup):
     def scale(self, scale):
         """ Scale wireframes in all directions from the centre of the group. """
         
-        for wireframe in self.wireframes.values():
-            wireframe.scale(scale, self.width/2, self.height/2, 0)
+        scale_matrix = wf.scaleMatrix(scale, self.width/2, self.height/2, 0)
+        self.transform(scale_matrix)
+
+    def rotate(self, axis, amount):
+        (x, y, z) = self.findCentre()
+        translation_matrix1 = wf.translationMatrix(-x, -y, -z)
+        translation_matrix2 = wf.translationMatrix(x, y, z)
+        
+        if axis == 'x':
+            rotation_matrix = wf.rotateXMatrix(amount)
+        elif axis == 'y':
+            rotation_matrix = wf.rotateYMatrix(amount)
+        elif axis == 'z':
+            rotation_matrix = wf.rotateZMatrix(amount)
+            
+        rotation_matrix = np.dot(np.dot(translation_matrix1, rotation_matrix), translation_matrix2)
+        self.transform(rotation_matrix)
 
     def display(self):
         self.screen.fill(self.background)

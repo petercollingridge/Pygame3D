@@ -1,10 +1,12 @@
 import math
+import numpy as np
 import wireframe as wf
 import wireframeDisplay as wd
 import basicShapes as shape
 
 def testWireframe():
-    """ Creates a triangle and cuboid wireframe. Output their node, edge and face values"""
+    """ Example of how to create wireframes node by node, and by using the basicShape module.
+        Creates a triangle and cuboid wireframe and outputs their node, edge and face values. """
     
     # Create a triangle by explictly passing the nodes and edges
     triangle = wf.Wireframe()
@@ -17,38 +19,46 @@ def testWireframe():
     cuboid.output()
 
 def testTranslate():
-    """ Creates a cuboid and translates it by vector (4,3,1). """
+    """ Example of how to translate a wireframe.
+        Creates a cuboid and translates it by vector (4,3,1). """
     
     cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.outputNodes()
     
     print "\n> Translate cuboid along vector [4 3 1]"
-    cuboid.translate(4, 3, 1)
+    cuboid.transform(wf.translationMatrix(4, 3, 1))
     cuboid.outputNodes()
     
 def testScale():
-    """ Creates a cuboid and scales it by 2, centred on (100,150,200). """
+    """ Example of how to scale a wireframe.
+        Creates a cuboid and scales it by 2, centred on (100,150,200). """
     
     cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.outputNodes()
 
     print "\n> Scale cuboid by 2, centred at (100,150,200)"
-    cuboid.scale(2, 100, 150, 200)
+    cuboid.transform(wf.scaleMatrix(2, 100, 150, 200))
     cuboid.outputNodes()
     
 def testRotate():
-    """ Creates a cuboid and rotates about its centre by pi/2 radians. """
+    """ Example of how to rotate a wireframe.
+        Creates a cuboid and rotates about its centre by pi/2 radians. """
     
     cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.outputNodes()
     
+    # Find rotation matrix
+    (x,y,z) = cuboid.findCentre()    
+    translation_matrix = wf.translationMatrix(-x, -y, -z)
+    rotation_matrix = np.dot(translation_matrix, wf.rotateXMatrix(math.pi/2))
+    rotation_matrix = np.dot(rotation_matrix, -translation_matrix)
+    
     print "\n> Rotate cuboid around its centre and the x-axis"
-    (x,y,z) = cuboid.findCentre()
-    cuboid.rotateX(y, z, math.pi/2)
+    cuboid.transform(rotation_matrix)
     cuboid.outputNodes()
 
 def testWireframeGroup():
-    """ Create a group of wireframes consisting of two cuboids. """
+    """ Example of how to create a group of named wireframes. """
 
     g = wf.WireframeGroup()
     g.addWireframe('cube1', shape.Cuboid((100,100,10), (20,30,40)))
