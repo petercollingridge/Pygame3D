@@ -2,17 +2,18 @@ import math
 import wireframe as wf
 import wireframeDisplay as wd
 
-def testWireframes():
-    """ Creates a triangle and cuboid wireframe. """
+def testWireframe():
+    """ Creates a triangle and cuboid wireframe. Output their node, edge and face values"""
     
+    # Create a triangle by explictly passing the nodes and edges
     triangle = wf.Wireframe()
     triangle.addNodes([[100,200,10], [200,200,10], [125,100,500]])
     triangle.addEdges([(0,1), (1,2), (2,0)])
     triangle.output()
     
+    # Create a cuboid using the basicShape module
     cuboid = wf.getCuboid((100,100,10), (20,30,40))
     cuboid.output()
-    print cuboid.nodes
 
 def testTranslate():
     """ Creates a cuboid and translates it by vector (4,3,1). """
@@ -73,10 +74,31 @@ def testSurface():
     viewer.addWireframe('triangle',  triangle)
     viewer.run()
 
-#testWireframes()
-#testScale()
-#testRotate()
-#testWireframeGroup()
-#testWireframeDisplay1()
-testWireframeDisplay2()
-#testSurface()
+def chooseExample():
+    examples = ['testWireframe',
+                'testTranslate',
+                'testScale',
+                'testRotate',
+                'testWireframeGroup',
+                'testWireframeDisplay1',
+                'testWireframeDisplay2',
+                'testSurface',
+                'exit']
+    
+    print "\nOptions:"
+    for i, e in enumerate(examples, 1):
+        print " %d. %s" % (i, e)
+        
+    makingChoice = True
+    
+    while makingChoice:
+        choice = input("\nChoose an option: ")
+        if choice > len(examples)-1:
+            print 'exit'
+            makingChoice = False
+        else:
+            print "> %s" % examples[choice-1]
+            exec("%s()" % examples[choice-1])
+    
+if __name__ == '__main__':
+    chooseExample()

@@ -106,3 +106,5 @@ class WireframeViewer(wf.WireframeGroup):
             
             self.display()
             self.update()
+            
+        pygame.quit()
