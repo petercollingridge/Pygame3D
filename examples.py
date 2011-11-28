@@ -1,6 +1,7 @@
 import math
 import wireframe as wf
 import wireframeDisplay as wd
+import basicShapes as shape
 
 def testWireframe():
     """ Creates a triangle and cuboid wireframe. Output their node, edge and face values"""
@@ -12,13 +13,13 @@ def testWireframe():
     triangle.output()
     
     # Create a cuboid using the basicShape module
-    cuboid = wf.getCuboid((100,100,10), (20,30,40))
+    cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.output()
 
 def testTranslate():
     """ Creates a cuboid and translates it by vector (4,3,1). """
     
-    cuboid = wf.getCuboid((100,100,10), (20,30,40))
+    cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.outputNodes()
     
     print "\n> Translate cuboid along vector [4 3 1]"
@@ -28,7 +29,7 @@ def testTranslate():
 def testScale():
     """ Creates a cuboid and scales it by 2, centred on (100,150,200). """
     
-    cuboid = wf.getCuboid((100,100,10), (20,30,40))
+    cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.outputNodes()
 
     print "\n> Scale cuboid by 2, centred at (100,150,200)"
@@ -38,7 +39,7 @@ def testScale():
 def testRotate():
     """ Creates a cuboid and rotates about its centre by pi/2 radians. """
     
-    cuboid = wf.getCuboid((100,100,10), (20,30,40))
+    cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.outputNodes()
     
     print "\n> Rotate cuboid around its centre and the x-axis"
@@ -50,25 +51,25 @@ def testWireframeGroup():
     """ Create a group of wireframes consisting of two cuboids. """
 
     g = wf.WireframeGroup()
-    g.addWireframe('cube1', wf.getCuboid((100,100,10), (20,30,40)))
-    g.addWireframe('cube2', wf.getCuboid(( 10,200,10), (10,40,20)))        
+    g.addWireframe('cube1', shape.Cuboid((100,100,10), (20,30,40)))
+    g.addWireframe('cube2', shape.Cuboid(( 10,200,10), (10,40,20)))        
     g.output()
 
 def testWireframeDisplay1():
     """ Create display with a cube. """
     
     viewer = wd.WireframeViewer(600, 400)
-    viewer.addWireframe('cube', wf.getCuboid((80,150,0), (200,200,200)))
+    viewer.addWireframe('cube', shape.Cuboid((80,150,0), (200,200,200)))
     viewer.run()
 
 def testWireframeDisplay2():
     """ Create display with two cuboids, a plane and spheroid. """
     
     viewer = wd.WireframeViewer(600, 400)
-    viewer.addWireframe('grid',  wf.getHorizontalGrid((20,400,0), (40,30), (14,20)))
-    viewer.addWireframe('cube1', wf.getCuboid((200,100,400), (20,30,40)))
-    viewer.addWireframe('cube2', wf.getCuboid((100,360, 20), (10,40,20)))
-    viewer.addWireframe('sphere', wf.getSpheroid((250,300, 100), (20,30,40)))
+    viewer.addWireframe('grid',  shape.HorizontalGrid((20,400,0), (40,30), (14,20)))
+    viewer.addWireframe('cube1', shape.Cuboid((200,100,400), (20,30,40)))
+    viewer.addWireframe('cube2', shape.Cuboid((100,360, 20), (10,40,20)))
+    viewer.addWireframe('sphere', shape.Spheroid((250,300, 100), (20,30,40)))
     viewer.run()
 
 def testSurface():
