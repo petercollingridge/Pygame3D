@@ -66,13 +66,22 @@ def testWireframeGroup():
     g.output()
 
 def testWireframeDisplay1():
-    """ Create display with a cube. """
+    """ Create and display a wireframe cube. """
     
     viewer = wd.WireframeViewer(600, 400)
     viewer.addWireframe('cube', shape.Cuboid((80,150,0), (200,200,200)))
+    viewer.displayFaces = False
     viewer.run()
 
 def testWireframeDisplay2():
+    """ Create and display a cube with . """
+    
+    viewer = wd.WireframeViewer(600, 400)
+    viewer.addWireframe('cube', shape.Cuboid((80,150,0), (200,200,200)))
+    viewer.displayEdges = False
+    viewer.run()
+    
+def testWireframeDisplay3():
     """ Create display with two cuboids, a plane and spheroid. """
     
     viewer = wd.WireframeViewer(600, 400)
@@ -101,6 +110,7 @@ def chooseExample():
                 'testWireframeGroup',
                 'testWireframeDisplay1',
                 'testWireframeDisplay2',
+                'testWireframeDisplay3',
                 'testSurface',
                 'exit']
     

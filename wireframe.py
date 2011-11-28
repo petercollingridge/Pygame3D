@@ -137,6 +137,9 @@ class Wireframe:
         max_values = self.nodes[:,:-1].max(axis=0)
         return 0.5*(min_values + max_values)
     
+    def sortedFaces(self):
+        return sorted(self.faces, key=lambda face: min(self.nodes[f][2] for f in face))
+    
     def update(self):
         """ Override this function to control wireframe behaviour. """
         pass

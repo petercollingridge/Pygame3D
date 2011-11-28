@@ -37,8 +37,9 @@ class WireframeViewer(wf.WireframeGroup):
         
         self.displayNodes = False
         self.displayEdges = True
+        self.displayFaces = True
         
-        self.perspective = 300.
+        self.perspective = False #300.
         self.eyeX = self.width/2
         self.eyeY = 100
         
@@ -82,24 +83,32 @@ class WireframeViewer(wf.WireframeGroup):
         
         for name, wireframe in self.wireframes.items():
             colour = self.wireframe_colours.get(name)
-            if colour:
-               for (n1, n2) in wireframe.edges:
-                    if self.perspective:
-                        if wireframe.nodes[n1][2] > -self.perspective and wireframe.nodes[n2][2] > -self.perspective:
-                            z1 = self.perspective/ (self.perspective+wireframe.nodes[n1][2])
-                            x1 = self.width/2  + z1*(wireframe.nodes[n1][0] - self.width/2)
-                            y1 = self.height/2 + z1*(wireframe.nodes[n1][1] - self.height/2)
-                
-                            z2 = self.perspective/ (self.perspective+wireframe.nodes[n2][2])
-                            x2 = self.width/2  + z2*(wireframe.nodes[n2][0] - self.width/2)
-                            y2 = self.height/2 + z2*(wireframe.nodes[n2][1] - self.height/2)
-                            
-                            pygame.draw.aaline(self.screen, colour, (x1, y1), (x2, y2), 1)
-                    else:
-                        pygame.draw.aaline(self.screen, colour, (wireframe.nodes[n1][0], wireframe.nodes[n1][1]), (wireframe.nodes[n2][0], wireframe.nodes[n2][1]), 1)
+            nodes = wireframe.nodes
             
+            if colour:
+                if self.displayFaces:
+                    for face in wireframe.sortedFaces():
+                        shade = (face[0]*16, face[1]*8, face[3]*4)
+                        pygame.draw.polygon(self.screen, shade, [(nodes[node][0], nodes[node][1]) for node in face], 0)
+            
+                if self.displayEdges:
+                    for (n1, n2) in wireframe.edges:
+                        if self.perspective:
+                            if wireframe.nodes[n1][2] > -self.perspective and nodes[n2][2] > -self.perspective:
+                                z1 = self.perspective/ (self.perspective + nodes[n1][2])
+                                x1 = self.width/2  + z1*(nodes[n1][0] - self.width/2)
+                                y1 = self.height/2 + z1*(nodes[n1][1] - self.height/2)
+                    
+                                z2 = self.perspective/ (self.perspective + nodes[n2][2])
+                                x2 = self.width/2  + z2*(nodes[n2][0] - self.width/2)
+                                y2 = self.height/2 + z2*(nodes[n2][1] - self.height/2)
+                                
+                                pygame.draw.aaline(self.screen, colour, (x1, y1), (x2, y2), 1)
+                        else:
+                            pygame.draw.aaline(self.screen, colour, (nodes[n1][0], nodes[n1][1]), (nodes[n2][0], nodes[n2][1]), 1)
+
             if self.displayNodes:
-                for node in wireframe.nodes:
+                for node in nodes:
                     pygame.draw.circle(self.screen, colour, (int(node[0]), int(node[1])), self.nodeRadius, 0)
         
         pygame.display.flip()
