@@ -1,7 +1,7 @@
 import numpy as np
 
 class Wireframe:
-    """ An array of 3D vectors and connecting edges """
+    """ An array of vectors in R3 and list of edges connecting them. """
     
     def __init__(self):
         self.nodes = np.zeros((0,4))
@@ -22,20 +22,32 @@ class Wireframe:
         for node_list in face_list:
             num_nodes = len(node_list)
             if all((node < len(self.nodes) for node in node_list)):
-                self.faces.append([self.nodes[node] for node in node_list])
-                self.addEdges([(node_list[n], node_list[(n+1)%num_nodes]) for n in range(num_nodes)])
+                #self.faces.append([self.nodes[node] for node in node_list])
+                self.faces.append(node_list)
+                self.addEdges([(node_list[n-1], node_list[n]) for n in range(num_nodes)])
     
     def output(self):
-        self.outputNodes()
-        self.outputEdges()    
+        if len(self.nodes) > 1:
+            self.outputNodes()
+        if self.edges:
+            self.outputEdges()
+        if self.faces:
+            self.outputFaces()  
     
     def outputNodes(self):
-        for i, node in enumerate(self.nodes):
-            print "Node %d: (%d, %d, %d)" % (i, node[0], node[1], node[2])
+        print "\n --- Nodes --- "
+        for i, (x, y, z, _) in enumerate(self.nodes):
+            print "   %d: (%d, %d, %d)" % (i, x, y, z)
 
     def outputEdges(self):
-        for i, edge in enumerate(self.edges):
-            print "Edge %d: %d -> %d" % (i, edge[0], edge[1])  
+        print "\n --- Edges --- "
+        for i, (node1, node2) in enumerate(self.edges):
+            print "   %d: %d -> %d" % (i, node1, node2)
+            
+    def outputFaces(self):
+        print "\n --- Faces --- "
+        for i, nodes in enumerate(self.faces):
+            print "   %d: (%s)" % (i, ", ".join(['%d' % n for n in nodes]))
     
     def transform(self, transformation_matrix):
         """ Apply a transformation defined by a transformation matrix """
