@@ -9,12 +9,14 @@ def testWireframe():
         Creates a triangle and cuboid wireframe and outputs their node, edge and face values. """
     
     # Create a triangle by explictly passing the nodes and edges
+    print "\nTriangle"
     triangle = wf.Wireframe()
     triangle.addNodes([[100,200,10], [200,200,10], [125,100,500]])
     triangle.addEdges([(0,1), (1,2), (2,0)])
     triangle.output()
     
     # Create a cuboid using the basicShape module
+    print "\nCuboid"
     cuboid = shape.Cuboid((100,100,10), (20,30,40))
     cuboid.output()
 
@@ -65,7 +67,7 @@ def testWireframeGroup():
     g.addWireframe('cube2', shape.Cuboid(( 10,200,10), (10,40,20)))        
     g.output()
 
-def testWireframeDisplay1():
+def testWireframeDisplay():
     """ Create and display a wireframe cube. """
     
     viewer = wd.WireframeViewer(600, 400)
@@ -73,11 +75,20 @@ def testWireframeDisplay1():
     viewer.displayFaces = False
     viewer.run()
 
-def testWireframeDisplay2():
-    """ Create and display a cube with . """
+def testSurfaceDisplayWithCube():
+    """ Create and display a cube with surfaces. """
     
     viewer = wd.WireframeViewer(600, 400)
-    viewer.addWireframe('cube', shape.Cuboid((80,150,0), (200,200,200)))
+    viewer.addWireframe('cube', shape.Cuboid((225,100,0), (200,200,200)))
+    viewer.displayEdges = False
+    viewer.run()
+    
+def testSurfaceDisplayWithSphere():
+    """ Create and display a cube with surfaces. """
+    
+    viewer = wd.WireframeViewer(600, 400)
+    viewer.addWireframe('sphere', shape.Spheroid((200,200, 20), (160,160,160), resolution=50))
+    print "Create a sphere with %d faces." % len(viewer.wireframes['sphere'].faces)
     viewer.displayEdges = False
     viewer.run()
     
@@ -91,37 +102,25 @@ def testWireframeDisplay3():
     viewer.addWireframe('sphere', shape.Spheroid((250,300, 100), (20,30,40)))
     viewer.run()
 
-def testSurface():
-    """ Create display that shows surfaces. """
-    
-    triangle = wf.Wireframe()
-    triangle.addNodes([[100,200,10], [200,200,10], [150,100,500],[100,300,20],[200,300,20]])
-    triangle.addFaces([(0,1,2), (0,1,4,3)])
-    
-    viewer = wd.WireframeViewer(600, 400)
-    viewer.addWireframe('triangle',  triangle)
-    viewer.run()
-
 def chooseExample():
     examples = ['testWireframe',
                 'testTranslate',
                 'testScale',
                 'testRotate',
                 'testWireframeGroup',
-                'testWireframeDisplay1',
-                'testWireframeDisplay2',
-                'testWireframeDisplay3',
-                'testSurface',
+                'testWireframeDisplay',
+                'testSurfaceDisplayWithCube',
+                'testSurfaceDisplayWithSphere',
                 'exit']
-    
-    print "\nOptions:"
-    for i, e in enumerate(examples, 1):
-        print " %d. %s" % (i, e)
         
-    makingChoice = True
-    
+    makingChoice = True    
     while makingChoice:
+        print "\nOptions:"
+        
+        for i, e in enumerate(examples, 1):
+            print " %d. %s" % (i, e)
         choice = input("\nChoose an option: ")
+        
         if choice > len(examples)-1:
             print '> exit'
             makingChoice = False
