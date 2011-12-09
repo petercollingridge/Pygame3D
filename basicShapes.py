@@ -7,9 +7,7 @@ def Cuboid((x,y,z), (w,h,d)):
 
     cuboid = wf.Wireframe()
     cuboid.addNodes(np.array([[nx,ny,nz] for nx in (x,x+w) for ny in (y,y+h) for nz in (z,z+d)]))
-    cuboid.addFaces([(0,1,3,2), (4,5,7,6)])
-    cuboid.addFaces([(0,1,5,4), (2,3,7,6)])
-    cuboid.addFaces([(0,2,6,4), (1,3,7,5)])
+    cuboid.addFaces([(0,1,3,2), (7,5,4,6), (4,5,1,0), (2,3,7,6), (0,2,6,4), (5,7,3,1)])
     
     return cuboid
     
@@ -26,13 +24,13 @@ def Spheroid((x,y,z), (rx, ry, rz), resolution=10):
 
     # Add square faces to whole spheroid but poles
     num_nodes = resolution*(resolution-1)
-    spheroid.addFaces([(m+n, m+(n+1)%resolution, (m+resolution)%resolution**2+(n+1)%resolution, (m+resolution)%num_nodes+n) for n in range(resolution) for m in range(0,num_nodes-resolution,resolution)])
+    spheroid.addFaces([(m+n, (m+resolution)%num_nodes+n, (m+resolution)%resolution**2+(n+1)%resolution, m+(n+1)%resolution) for n in range(resolution) for m in range(0,num_nodes-resolution,resolution)])
 
     # Add poles and triangular faces around poles
     spheroid.addNodes([(x, y+ry, z),(x, y-ry, z)])
-    spheroid.addFaces([(num_nodes+1, (n+1)%resolution, n) for n in range(resolution)])
+    spheroid.addFaces([(n, (n+1)%resolution, num_nodes+1) for n in range(resolution)])
     start_node = num_nodes-resolution
-    spheroid.addFaces([(num_nodes, start_node+n, start_node+(n+1)%resolution) for n in range(resolution)])
+    spheroid.addFaces([(num_nodes, start_node+(n+1)%resolution, start_node+n) for n in range(resolution)])
 
     return spheroid
     

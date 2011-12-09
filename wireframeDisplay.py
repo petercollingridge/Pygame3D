@@ -44,7 +44,7 @@ class WireframeViewer(wf.WireframeGroup):
         self.eyeY = 100
         
         self.light = np.array((0, -1, 0))
-        self.min_light = 0.1
+        self.min_light = 0.05
         self.max_light = 1.0
         self.light_range = 0.5*(self.max_light - self.min_light)        
         
