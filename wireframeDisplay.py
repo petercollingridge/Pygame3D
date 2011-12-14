@@ -51,14 +51,13 @@ class WireframeViewer(wf.WireframeGroup):
         self.perspective = False #300.
         self.eyeX = self.width/2
         self.eyeY = 100
+        self.view_vector = np.array([0, 0, -1])
         
         self.light = wf.Wireframe()
         self.light.addNodes([[0, -1, 0]])
-        self.light.transform(wf.rotateZMatrix(0.3))
-        self.light.transform(wf.rotateXMatrix(0.4))
         
         self.min_light = 0.05 * 255
-        self.max_light = 0.92 * 255
+        self.max_light = 1.0 * 255
         self.light_range = self.max_light - self.min_light 
         
         self.background = (10,10,50)
@@ -98,30 +97,43 @@ class WireframeViewer(wf.WireframeGroup):
 
     def display(self):
         self.screen.fill(self.background)
+        light = self.light.nodes[0][:3]
+        spectral_highlight = self.light.nodes[0][:3] + self.view_vector
+        spectral_highlight /= np.linalg.norm(spectral_highlight)
         
         for name, wireframe in self.wireframes.items():
             colour = self.wireframe_colours.get(name)
             nodes = wireframe.nodes
-            light = self.light.nodes[0][:3]
             
             if colour:
                 if self.displayFaces:
                     for face in wireframe.sortedFaces():
                         v1 = (nodes[face[1]] - nodes[face[0]])[:3]
                         v2 = (nodes[face[2]] - nodes[face[0]])[:3]
-                        normal = np.cross(v1, v2)   # test to see whether it faces us
-                        normal /= np.linalg.norm(normal)
                         
-                        theta = np.dot(normal, light)
-                        if theta < 0:
-                            shade = (self.min_light, 0, 0)
-                        else:
-                            shade = (int(theta*self.light_range+self.min_light), 0, 0)
-                        pygame.draw.polygon(self.screen, shade, [(nodes[node][0], nodes[node][1]) for node in face], 0)
+                        normal = np.cross(v1, v2)
+                        towards_us = np.dot(normal, self.view_vector)
                         
-                        #mean_x = sum(nodes[node][0] for node in face) / len(face)
-                        #mean_y = sum(nodes[node][1] for node in face) / len(face)
-                        #pygame.draw.aaline(self.screen, (255,255,255), (mean_x, mean_y), (mean_x+25*normal[0], mean_y+25*normal[1]), 1)
+                        # Only draw faces that face us
+                        if towards_us > 0:
+                            normal /= np.linalg.norm(normal)
+                            theta = np.dot(normal, light)
+                            #catchlight_face = np.dot(normal, spectral_highlight) ** 25
+
+                            c = 0
+                            if theta < 0:
+                                r = self.min_light
+                            else:
+                                r = int(theta * self.light_range + self.min_light) #+ int(255 * catchlight_face)
+                                if r > 255:
+                                    c = r - 255
+                                    r = 255
+                            
+                            pygame.draw.polygon(self.screen, (r, c, c), [(nodes[node][0], nodes[node][1]) for node in face], 0)
+                            
+                            #mean_x = sum(nodes[node][0] for node in face) / len(face)
+                            #mean_y = sum(nodes[node][1] for node in face) / len(face)
+                            #pygame.draw.aaline(self.screen, (255,255,255), (mean_x, mean_y), (mean_x+25*normal[0], mean_y+25*normal[1]), 1)
             
                 if self.displayEdges:
                     for (n1, n2) in wireframe.edges:
