@@ -43,10 +43,14 @@ class WireframeViewer(wf.WireframeGroup):
         self.eyeX = self.width/2
         self.eyeY = 100
         
-        self.light = np.array((0, -1, 0))
-        self.min_light = 0.05
-        self.max_light = 1.0
-        self.light_range = 0.5*(self.max_light - self.min_light)        
+        self.light = wf.Wireframe()
+        self.light.addNodes([[0, -1, 0]])
+        self.light.transform(wf.rotateZMatrix(0.3))
+        self.light.transform(wf.rotateXMatrix(0.4))
+        
+        self.min_light = 0.05 * 255
+        self.max_light = 0.92 * 255
+        self.light_range = self.max_light - self.min_light 
         
         self.background = (10,10,50)
         self.nodeColour = (250,250,250)
@@ -89,6 +93,7 @@ class WireframeViewer(wf.WireframeGroup):
         for name, wireframe in self.wireframes.items():
             colour = self.wireframe_colours.get(name)
             nodes = wireframe.nodes
+            light = self.light.nodes[0][:3]
             
             if colour:
                 if self.displayFaces:
@@ -98,13 +103,16 @@ class WireframeViewer(wf.WireframeGroup):
                         normal = np.cross(v1, v2)   # test to see whether it faces us
                         normal /= np.linalg.norm(normal)
                         
-                        light = self.light_range*np.dot(normal, self.light) + 1 - self.light_range
-                        shade = (int(255*light), 0, 0)
+                        theta = np.dot(normal, light)
+                        if theta < 0:
+                            shade = (self.min_light, 0, 0)
+                        else:
+                            shade = (int(theta*self.light_range+self.min_light), 0, 0)
                         pygame.draw.polygon(self.screen, shade, [(nodes[node][0], nodes[node][1]) for node in face], 0)
                         
-                        mean_x = sum(nodes[node][0] for node in face) / len(face)
-                        mean_y = sum(nodes[node][1] for node in face) / len(face)
-                        pygame.draw.aaline(self.screen, (255,255,255), (mean_x, mean_y), (mean_x+25*normal[0], mean_y+25*normal[1]), 1)
+                        #mean_x = sum(nodes[node][0] for node in face) / len(face)
+                        #mean_y = sum(nodes[node][1] for node in face) / len(face)
+                        #pygame.draw.aaline(self.screen, (255,255,255), (mean_x, mean_y), (mean_x+25*normal[0], mean_y+25*normal[1]), 1)
             
                 if self.displayEdges:
                     for (n1, n2) in wireframe.edges:
