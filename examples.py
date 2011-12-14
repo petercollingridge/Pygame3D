@@ -10,8 +10,7 @@ def testWireframe():
     
     # Create a triangle by explictly passing the nodes and edges
     print "\nTriangle"
-    triangle = wf.Wireframe()
-    triangle.addNodes([[100,200,10], [200,200,10], [125,100,500]])
+    triangle = wf.Wireframe([[100,200,10], [200,200,10], [125,100,500]])
     triangle.addEdges([(0,1), (1,2), (2,0)])
     triangle.output()
     

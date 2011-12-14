@@ -76,10 +76,13 @@ def rotateAboutVector((cx,cy,cz), (x,y,z), radians):
 class Wireframe:
     """ An array of vectors in R3 and list of edges connecting them. """
     
-    def __init__(self):
+    def __init__(self, nodes=None):
         self.nodes = np.zeros((0,4))
         self.edges = []
         self.faces = []
+        
+        if nodes:
+            self.addNodes(nodes)
 
     def addNodes(self, node_array):
         """ Append 1s to a list of 3-tuples and add to self.nodes. """
