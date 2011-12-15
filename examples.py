@@ -85,8 +85,23 @@ def testSurfaceDisplayWithCube():
 def testSurfaceDisplayWithSphere():
     """ Create and display a cube with surfaces. """
     
+    resolution = 52
     viewer = wd.WireframeViewer(600, 400)
-    viewer.addWireframe('sphere', shape.Spheroid((200,200, 20), (160,160,160), resolution=50))
+    viewer.addWireframe('sphere', shape.Spheroid((300,200, 20), (160,160,160), resolution=resolution))
+
+    # Colour ball
+    faces = viewer.wireframes['sphere'].faces
+    for i in range(resolution/4):
+        for j in range(resolution*2-4):
+            f = i*(resolution*4-8) +j
+            faces[f][1][1] = 0
+            faces[f][1][2] = 0
+        
+    # Colour with lattitude
+    #for (face, colour) in faces[::2]:
+    #    colour[1] = 0
+    #    colour[2] = 0
+    
     print "Create a sphere with %d faces." % len(viewer.wireframes['sphere'].faces)
     viewer.displayEdges = False
     viewer.run()

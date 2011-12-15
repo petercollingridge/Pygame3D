@@ -97,12 +97,12 @@ class Wireframe:
         # Should raise exception if edge value > len(self.nodes)
         self.edges += [edge for edge in edge_list if edge not in self.edges]
 
-    def addFaces(self, face_list):
+    def addFaces(self, face_list, face_colour=(255,255,255)):
         for node_list in face_list:
             num_nodes = len(node_list)
             if all((node < len(self.nodes) for node in node_list)):
                 #self.faces.append([self.nodes[node] for node in node_list])
-                self.faces.append(node_list)
+                self.faces.append((node_list, np.array(face_colour, np.uint8)))
                 self.addEdges([(node_list[n-1], node_list[n]) for n in range(num_nodes)])
     
     def output(self):
@@ -141,7 +141,7 @@ class Wireframe:
         return 0.5*(min_values + max_values)
     
     def sortedFaces(self):
-        return sorted(self.faces, key=lambda face: min(self.nodes[f][2] for f in face))
+        return sorted(self.faces, key=lambda face: min(self.nodes[f][2] for f in face[0]))
     
     def update(self):
         """ Override this function to control wireframe behaviour. """

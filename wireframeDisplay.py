@@ -56,13 +56,15 @@ class WireframeViewer(wf.WireframeGroup):
         self.light = wf.Wireframe()
         self.light.addNodes([[0, -1, 0]])
         
-        self.min_light = 0.05 * 255
-        self.max_light = 1.0 * 255
+        self.min_light = 0.02
+        self.max_light = 1.0
         self.light_range = self.max_light - self.min_light 
         
         self.background = (10,10,50)
         self.nodeColour = (250,250,250)
         self.nodeRadius = 4
+        
+        self.control = 0
     
     def addWireframe(self, name, wireframe):
         self.wireframes[name] = wireframe
@@ -102,38 +104,32 @@ class WireframeViewer(wf.WireframeGroup):
         spectral_highlight /= np.linalg.norm(spectral_highlight)
         
         for name, wireframe in self.wireframes.items():
-            colour = self.wireframe_colours.get(name)
             nodes = wireframe.nodes
             
-            if colour:
-                if self.displayFaces:
-                    for face in wireframe.sortedFaces():
-                        v1 = (nodes[face[1]] - nodes[face[0]])[:3]
-                        v2 = (nodes[face[2]] - nodes[face[0]])[:3]
-                        
-                        normal = np.cross(v1, v2)
-                        towards_us = np.dot(normal, self.view_vector)
-                        
-                        # Only draw faces that face us
-                        if towards_us > 0:
-                            normal /= np.linalg.norm(normal)
-                            theta = np.dot(normal, light)
-                            #catchlight_face = np.dot(normal, spectral_highlight) ** 25
+            if self.displayFaces:
+                for (face, colour) in wireframe.sortedFaces():
+                    v1 = (nodes[face[1]] - nodes[face[0]])[:3]
+                    v2 = (nodes[face[2]] - nodes[face[0]])[:3]
+                    
+                    normal = np.cross(v1, v2)
+                    towards_us = np.dot(normal, self.view_vector)
+                    
+                    # Only draw faces that face us
+                    if towards_us > 0:
+                        normal /= np.linalg.norm(normal)
+                        theta = np.dot(normal, light)
+                        #catchlight_face = np.dot(normal, spectral_highlight) ** 25
 
-                            c = 0
-                            if theta < 0:
-                                r = self.min_light
-                            else:
-                                r = int(theta * self.light_range + self.min_light) #+ int(255 * catchlight_face)
-                                if r > 255:
-                                    c = r - 255
-                                    r = 255
-                            
-                            pygame.draw.polygon(self.screen, (r, c, c), [(nodes[node][0], nodes[node][1]) for node in face], 0)
-                            
-                            #mean_x = sum(nodes[node][0] for node in face) / len(face)
-                            #mean_y = sum(nodes[node][1] for node in face) / len(face)
-                            #pygame.draw.aaline(self.screen, (255,255,255), (mean_x, mean_y), (mean_x+25*normal[0], mean_y+25*normal[1]), 1)
+                        c = 0
+                        if theta < 0:
+                            shade = self.min_light * colour
+                        else:
+                            shade = (theta * self.light_range + self.min_light) * colour
+                        pygame.draw.polygon(self.screen, shade, [(nodes[node][0], nodes[node][1]) for node in face], 0)
+                        
+                        #mean_x = sum(nodes[node][0] for node in face) / len(face)
+                        #mean_y = sum(nodes[node][1] for node in face) / len(face)
+                        #pygame.draw.aaline(self.screen, (255,255,255), (mean_x, mean_y), (mean_x+25*normal[0], mean_y+25*normal[1]), 1)
             
                 if self.displayEdges:
                     for (n1, n2) in wireframe.edges:
@@ -159,8 +155,8 @@ class WireframeViewer(wf.WireframeGroup):
 
     def keyEvent(self, key):
         if key in key_to_function:
-            #key_to_function[key](self)
-            light_movement[key](self.light)
+            key_to_function[key](self)
+            #light_movement[key](self.light)
 
     def run(self):
         """ Display wireframe on screen and respond to keydown events """
